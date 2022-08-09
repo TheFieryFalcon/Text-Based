@@ -1,8 +1,6 @@
 ﻿#pragma warning disable IDE0057, CS8600, CS8602
 
 Variable variable = new Variable();
-StringToInt StringToInt = new StringToInt();
-Variable.StringToIntAdder();
 void ExplorationEngine(int CurrentTile)
 {
 
@@ -21,9 +19,11 @@ void ExplorationEngine(int CurrentTile)
 
     InvestigationResults.Add(0, "You see an axe lying on the floor of the jungle.");
     InvestigationResults.Add(4, "You see an open box to the left of your gaze. It appears to hold hammers, nails, and other miscellaneous items.");
+    InvestigationResults.Add(8, "You lean in for a closer look at the door and you see what appears to be a weaker part of the door. Perhaps you could break in somehow...");
     CraftingResults.Add("Planks", "Boat");
     ItemUsages.Add(0, new string[] { "Axe", "You heave the (quite heavy) axe at a tree again and again until it falls. Then, you chop the wood up until it becomes planks.", "You gain: Planks", "Planks", "Obtain Item" });
     ItemUsages.Add(1, new string[] { "Boat", "You take your makeshift raft into the swamp and paddle it with a plank of wood. Eventually, you find some land.", "", "8", "Go To" });
+    ItemUsages.Add(8, new string[] {"Axe", "You take your axe out and violently smash it into the door a few times until it bursts open. You enter and find some notes and a "}); 
     string[] locationDesc = new string[] {
     "In the jungle, you trudge for what seems like hours before arriving at a familiar crossroads. It seems as though you are lost. Which direction will you go in?",
     "You arrive at the edge of a jungle. In front of you is a vast swamp.",
@@ -32,7 +32,8 @@ void ExplorationEngine(int CurrentTile)
     "You arrive in a breathtaking expanse of grass, stretching all the way to the horizon as far as you can see.",
     "You are in a martian-like expanse of red sand. Off in the distance, you see a few vultures circling high above.",
     "In front of you is a vast lake, at the center of which you can vaguely make out an island shrouded by mist.",
-    "Placeholder"
+    "Placeholder",
+    "You take your makeshift raft into the swamp and paddle it with a plank of wood. Eventually, you find some land. It is a muddy island, and on the island appears to be a small wooden hut. You try to open it, but the door is locked."
 
         };
 
@@ -220,7 +221,7 @@ void ExplorationEngine(int CurrentTile)
 
                         break;
                     case "Go To":
-                        CurrentTile = StringToInt.stringToInt[ItemUsages[CurrentTile][3]];
+                        CurrentTile = Int32.Parse(ItemUsages[CurrentTile][3]);
                         Console.WriteLine(locationDesc[CurrentTile]);
                         break;
                 }
