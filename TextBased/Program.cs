@@ -1,8 +1,11 @@
 ﻿#pragma warning disable IDE0057, CS8600, CS8602
+
 Variable variable = new Variable();
+StringToInt StringToInt = new StringToInt();
+Variable.StringToIntAdder();
 void ExplorationEngine(int CurrentTile)
 {
-    
+
 
     int[] movementEast = new int[] { 1, 1, 0, 3, 4, 5/*placeholder*/, 6/*placeholder*/, 7 };
     string[] locationName = new string[] { "Jungle", "Marsh", "East of House", "Mysterious House", "Plains", "Mesa", "Lake", "Island" };
@@ -10,16 +13,17 @@ void ExplorationEngine(int CurrentTile)
     int[] movementSouth = new int[] { 4, 1/*placeholder*/, 2, 3, 5, 6, 6/*placeholder*/, 7 };
     int[] movementNorth = new int[] { 0/*placeholder*/, 1/*placeholder*/, 2, 3, 0, 4, 5, 7 };
     Dictionary<int, string> ItemsInLocation = new Dictionary<int, string>();
-    string[,,] ItemUsages = new string[,,] { { { "Axe", "You heave the (quite heavy) axe and somehow manage to chop down a tree. Then, you clumsily cut the log in half multiple times until you have several planks.", "You gain: Planks", "Planks", "Obtain Item" }, {"", "", "", "", ""} } };
+    Dictionary<int, string[]> ItemUsages = new Dictionary<int, string[]>();
     ItemsInLocation.Add(0, "Axe");
     ItemsInLocation.Add(4, "Crafting Kit");
     Dictionary<string, string> CraftingResults = new Dictionary<string, string>();
     Dictionary<int, string> InvestigationResults = new Dictionary<int, string>();
+
     InvestigationResults.Add(0, "You see an axe lying on the floor of the jungle.");
     InvestigationResults.Add(4, "You see an open box to the left of your gaze. It appears to hold hammers, nails, and other miscellaneous items.");
     CraftingResults.Add("Planks", "Boat");
-    
-    
+    ItemUsages.Add(0, new string[] { "Axe", "You heave the (quite heavy) axe at a tree again and again until it falls. Then, you chop the wood up until it becomes planks.", "You gain: Planks", "Planks", "Obtain Item" });
+    ItemUsages.Add(1, new string[] { "Boat", "You take your makeshift raft into the swamp and paddle it with a plank of wood. Eventually, you find some land.", "", "8", "Go To" });
     string[] locationDesc = new string[] {
     "In the jungle, you trudge for what seems like hours before arriving at a familiar crossroads. It seems as though you are lost. Which direction will you go in?",
     "You arrive at the edge of a jungle. In front of you is a vast swamp.",
@@ -32,18 +36,19 @@ void ExplorationEngine(int CurrentTile)
 
         };
 
-    
+
 
     //This function handles exploration: movement based on your current location
     Console.WriteLine("YOU ARE IN: " + locationName[CurrentTile]);
     string Input;
-    
+
     Input = Console.ReadLine();
     string movementDirection;
-    
+
     var JungleRNG = new Random(); //you can only proceed if you roll a 5 on a d10
     if (Input.StartsWith("go") && Input.Length > 3) //go command
     {
+        int tileToMoveTo = CurrentTile;
         if (CurrentTile == 0) //if you are in a jungle
         {
             if (JungleRNG.Next(1, 6) == 5) //and you roll a 5, you can move
@@ -52,25 +57,30 @@ void ExplorationEngine(int CurrentTile)
                 movementDirection = Input.Substring(3);
                 if (movementDirection == "east")
                 {
-                    CurrentTile = movementEast[CurrentTile];
+                    tileToMoveTo = movementEast[CurrentTile];
 
                 }
                 else if (movementDirection == "west")
                 {
-                    CurrentTile = movementWest[CurrentTile];
+                    tileToMoveTo = movementWest[CurrentTile];
                 }
                 else if (movementDirection == "north")
                 {
-                    CurrentTile = movementNorth[CurrentTile];
+                    tileToMoveTo = movementNorth[CurrentTile];
                 }
                 else if (movementDirection == "south")
                 {
-                    CurrentTile = movementSouth[CurrentTile];
+                    tileToMoveTo = movementSouth[CurrentTile];
                 }
                 else
                 {
                     Console.WriteLine("Invalid Direction.");
                 }
+            }
+            else
+            {
+                Console.WriteLine("You stumble around the jungle, and eventually found yourself back in the exact same spot you were before.");
+
             }
 
         }
@@ -80,27 +90,31 @@ void ExplorationEngine(int CurrentTile)
             movementDirection = Input.Substring(3);
             if (movementDirection == "east")
             {
-                CurrentTile = movementEast[CurrentTile];
+                tileToMoveTo = movementEast[CurrentTile];
 
             }
             else if (movementDirection == "west")
             {
-                CurrentTile = movementWest[CurrentTile];
+                tileToMoveTo = movementWest[CurrentTile];
             }
             else if (movementDirection == "north")
             {
-                CurrentTile = movementNorth[CurrentTile];
+                tileToMoveTo = movementNorth[CurrentTile];
             }
             else if (movementDirection == "south")
             {
-                CurrentTile = movementSouth[CurrentTile];
+                tileToMoveTo = movementSouth[CurrentTile];
             }
             else
             {
                 Console.WriteLine("Invalid Direction.");
+
             }
+
         }
+        CurrentTile = tileToMoveTo;
         Console.WriteLine(locationDesc[CurrentTile]);
+
     }
     else if (Input.StartsWith("help")) //help command
     {
@@ -127,7 +141,7 @@ void ExplorationEngine(int CurrentTile)
             {
                 variable.GetItem(item);
 
-                Console.WriteLine("You have obtained " + item + ". You now have " + (variable.inventory.Length-1) + " items.");
+                Console.WriteLine("You have obtained " + item + ". You now have " + (variable.inventory.Length - 1) + " items.");
             }
             else
             {
@@ -184,41 +198,45 @@ void ExplorationEngine(int CurrentTile)
             {
                 Console.WriteLine("You do not have that item.");
             }
-           
+
         }
         else
         {
-            for (int i = 0; i < 2; i++)
+
+
+            if (variable.inventory.Contains(ItemUsages[CurrentTile][0]) && Input.Substring(4) == ItemUsages[CurrentTile][0])
+
             {
-
-                if (variable.inventory.Contains(ItemUsages[CurrentTile, i, 0]) && Input.Substring(4) == ItemUsages[CurrentTile, i, 0])
-
+                switch (ItemUsages[CurrentTile][4])
                 {
-                    switch (ItemUsages[CurrentTile, i, 4])
-                    {
-                        case "Obtain Item":
-                            string item = ItemUsages[CurrentTile, i, 3];
-                            var isPresentInInventory = variable.GetItem(item);
-                            if (isPresentInInventory == 0)
-                            {
-                                Console.WriteLine(ItemUsages[CurrentTile, i, 1]);
-                            }
+                    case "Obtain Item":
+                        string item = ItemUsages[CurrentTile][3];
+                        var isPresentInInventory = variable.GetItem(item);
+                        if (isPresentInInventory == 0)
+                        {
+                            Console.WriteLine(ItemUsages[CurrentTile][1]);
+                            Console.WriteLine(ItemUsages[CurrentTile][2]);
+                        }
 
-                            break;
-
-                    }
-
-                }
-                else if (!variable.inventory.Contains(ItemUsages[CurrentTile, i, 0]) && Input.Substring(4) == ItemUsages[CurrentTile, i, 0])
-                {
-                    Console.WriteLine("You do not have that item.");
+                        break;
+                    case "Go To":
+                        CurrentTile = StringToInt.stringToInt[ItemUsages[CurrentTile][3]];
+                        Console.WriteLine(locationDesc[CurrentTile]);
+                        break;
                 }
 
 
             }
+            else if (!variable.inventory.Contains(ItemUsages[CurrentTile][0]) && Input.Substring(4) == ItemUsages[CurrentTile][0])
+            {
+                Console.WriteLine("You do not have that item.");
+            }
+
+
+
         }
-        
-        
+
+
 
     }
     else if (Input.StartsWith("investigate"))
@@ -242,14 +260,15 @@ void ExplorationEngine(int CurrentTile)
         Console.WriteLine("Invalid Command or Invalid Version.");
     }
 
-    
+
     ExplorationEngine(CurrentTile);
 
 }
 
 Console.WriteLine("Build Successful. Starting Game...");
-Console.WriteLine("Textblocks Version Dev-06082022-01"); //UPDATE EVERY DAY
+Console.WriteLine("Textblocks Version Dev-09082022-01"); //UPDATE EVERY DAY
 ExplorationEngine(2);
+
 
 
 
