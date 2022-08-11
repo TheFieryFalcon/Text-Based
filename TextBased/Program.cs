@@ -16,14 +16,14 @@ void ExplorationEngine(int CurrentTile)
     ItemsInLocation.Add(4, "Crafting Kit");
     Dictionary<string, string> CraftingResults = new Dictionary<string, string>();
     Dictionary<int, string> InvestigationResults = new Dictionary<int, string>();
-
+    
     InvestigationResults.Add(0, "You see an axe lying on the floor of the jungle.");
     InvestigationResults.Add(4, "You see an open box to the left of your gaze. It appears to hold hammers, nails, and other miscellaneous items.");
     InvestigationResults.Add(8, "You lean in for a closer look at the door and you see what appears to be a weaker part of the door. Perhaps you could break in somehow...");
     CraftingResults.Add("Planks", "Boat");
     ItemUsages.Add(0, new string[] { "Axe", "You heave the (quite heavy) axe at a tree again and again until it falls. Then, you chop the wood up until it becomes planks.", "You gain: Planks", "Planks", "Obtain Item" });
     ItemUsages.Add(1, new string[] { "Boat", "You take your makeshift raft into the swamp and paddle it with a plank of wood. Eventually, you find some land.", "", "8", "Go To" });
-    ItemUsages.Add(8, new string[] {"Axe", "You take your axe out and violently smash it into the door a few times until it bursts open. You enter and find some notes and a "}); 
+    ItemUsages.Add(8, new string[] {"Axe", "You take your axe out and violently smash it into the door a few times until it bursts open. You enter and find some notes and a rusty sword. The note reads: \" The Last Will And Testament of Sir William Cumberlatch \". You flip it over, but that is all that appeared.", "You Gain: Rusty Sword", "Sword", "Obtain Item"}); 
     string[] locationDesc = new string[] {
     "In the jungle, you trudge for what seems like hours before arriving at a familiar crossroads. It seems as though you are lost. Which direction will you go in?",
     "You arrive at the edge of a jungle. In front of you is a vast swamp.",
@@ -267,7 +267,7 @@ void ExplorationEngine(int CurrentTile)
 }
 
 Console.WriteLine("Build Successful. Starting Game...");
-Console.WriteLine("Textblocks Version Dev-09082022-01"); //UPDATE EVERY DAY
+Console.WriteLine("Textblocks Version Dev-10082022-01"); //UPDATE EVERY DAY
 ExplorationEngine(2);
 
 
