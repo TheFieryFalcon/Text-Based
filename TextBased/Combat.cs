@@ -1,8 +1,8 @@
 
-public class Combat
+public static class Combat
 {
     
-    static int[] CombatLoop(string enemy, int Health, int Attack, int Defense, int Speed, int Level)
+    public static int[] CombatLoop(string enemy, int Health, int Attack, int Defense, int Speed, int Level)
     {
         //EnemyStats ID 0 = Health, 1 = Attack, 2 = Defense, 3 = Enemy ID, 4 = Speed, 5 = Level
         Dictionary<string, int[]> EnemyStats = new Dictionary<string, int[]>();
@@ -58,6 +58,7 @@ public class Combat
                 else
                 {
                     Random HitOrMiss = new Random();
+                    Console.WriteLine("The enemy attacks!");
                     if (HitOrMiss.Next(11) > Level / EnemyStats[enemy][5])
                     {
                         Health -= (int)(EnemyStats[enemy][1] * 2m / (Defense * 1.2m + 1m));
@@ -75,7 +76,7 @@ public class Combat
             if(Health > 0)
             {
                 Console.WriteLine($"You won! You gain {xpAmount} EXP.");
-                return (new int[] { 2, Health, EnemyStats[enemy][3] });
+                return (new int[] { 2, Health, xpAmount, EnemyStats[enemy][3] });
             }
             else
             {
@@ -88,6 +89,27 @@ public class Combat
         {
             return (new int[] {0, Health}); //Dialogue: Enemy not found.
         }
+
+    }
+    public static string[] RollLootDrops(int EnemyID)
+    {
+        Dictionary<int, Dictionary<string, int>> Drops = new Dictionary<int, Dictionary<string, int>>();
+        Dictionary<int, Dictionary<int, string>> DropIDs = new Dictionary<int, Dictionary<int, string>>();
+        Drops.Add(0, new Dictionary<string, int>());
+        Drops[0].Add("Vulture Feather", 8);
+        DropIDs.Add(0, new Dictionary<int, string>());
+        DropIDs[0].Add(0, "Vulture Feather");
+        string[] TotalDrops = new string[0];
+        Random DropRNG = new Random();
+        for (int i = 0; i < Drops[EnemyID].Count; i++)
+        {
+            if(DropRNG.Next(Drops[EnemyID][DropIDs[0][i]] + 1) == Drops[EnemyID][DropIDs[0][i]])
+            {
+                Array.Resize(ref TotalDrops, TotalDrops.Length + 1);
+                TotalDrops[TotalDrops.Length - 1] = DropIDs[0][i];
+            }
+        }
+        return TotalDrops;
 
     }
 }

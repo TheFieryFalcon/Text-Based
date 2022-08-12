@@ -1,19 +1,28 @@
 ﻿#pragma warning disable IDE0057, CS8600, CS8602
 
 Variable variable = new Variable();
+int Level = 1;
+int SwordLevel = 0;
+int Attack = 1;
+int Defense = 0;
+int Speed = 0;
+int Health = 20;
+int XPUntilNextLevel = 100;
 void ExplorationEngine(int CurrentTile)
 {
 
-
-    int[] movementEast = new int[] { 1, 1, 0, 3, 4, 5/*placeholder*/, 6/*placeholder*/, 7 };
-    string[] locationName = new string[] { "Jungle", "Marsh", "East of House", "Mysterious House", "Plains", "Mesa", "Lake", "Island" };
-    int[] movementWest = new int[] { 2, 0, 2, 3, 4/*placeholder*/, 5/*placeholder*/, 6/*placeholder*/, 7 };
-    int[] movementSouth = new int[] { 4, 1/*placeholder*/, 2, 3, 5, 6, 6/*placeholder*/, 7 };
-    int[] movementNorth = new int[] { 0/*placeholder*/, 1/*placeholder*/, 2, 3, 0, 4, 5, 7 };
+    Attack = Attack * SwordLevel;
+    int[] movementEast = new int[] { 1, 1, 0, 3, 4, 5/*placeholder*/, 6/*placeholder*/, 7, 8/*placeholder*/};
+    string[] locationName = new string[] { "Jungle", "Marsh", "East of House", "Mysterious House", "Plains", "Mesa", "Lake", "Island", "Marsh Island" };
+    int[] movementWest = new int[] { 2, 0, 2, 3, 4/*placeholder*/, 5/*placeholder*/, 6/*placeholder*/, 7, 1};
+    int[] movementSouth = new int[] { 4, 1/*placeholder*/, 2, 3, 5, 6, 6/*placeholder*/, 7, 8/*placeholder*/ };
+    int[] movementNorth = new int[] { 0/*placeholder*/, 1/*placeholder*/, 2, 3, 0, 4, 5, 7, 8/*placeholder*/ };
     Dictionary<int, string> ItemsInLocation = new Dictionary<int, string>();
     Dictionary<int, string[]> ItemUsages = new Dictionary<int, string[]>();
+    Dictionary<int, string> EnemiesInLocation = new Dictionary<int, string>();
     ItemsInLocation.Add(0, "Axe");
     ItemsInLocation.Add(4, "Crafting Kit");
+    EnemiesInLocation.Add(5, "Vulture");
     Dictionary<string, string> CraftingResults = new Dictionary<string, string>();
     Dictionary<int, string> InvestigationResults = new Dictionary<int, string>();
     
@@ -23,7 +32,7 @@ void ExplorationEngine(int CurrentTile)
     CraftingResults.Add("Planks", "Boat");
     ItemUsages.Add(0, new string[] { "Axe", "You heave the (quite heavy) axe at a tree again and again until it falls. Then, you chop the wood up until it becomes planks.", "You gain: Planks", "Planks", "Obtain Item" });
     ItemUsages.Add(1, new string[] { "Boat", "You take your makeshift raft into the swamp and paddle it with a plank of wood. Eventually, you find some land.", "", "8", "Go To" });
-    ItemUsages.Add(8, new string[] {"Axe", "You take your axe out and violently smash it into the door a few times until it bursts open. You enter and find some notes and a rusty sword. The note reads: \" The Last Will And Testament of Sir William Cumberlatch \". You flip it over, but that is all that appeared.", "You Gain: Rusty Sword", "Sword", "Obtain Item"}); 
+    ItemUsages.Add(8, new string[] { "Axe", "You take the axe and slam it into the door of the house over and over again. You then step into the house and find a rusty sword sitting there.", "You gain: Sword", "Sword", "Obtain Item"});
     string[] locationDesc = new string[] {
     "In the jungle, you trudge for what seems like hours before arriving at a familiar crossroads. It seems as though you are lost. Which direction will you go in?",
     "You arrive at the edge of a jungle. In front of you is a vast swamp.",
@@ -36,7 +45,7 @@ void ExplorationEngine(int CurrentTile)
     "You take your makeshift raft into the swamp and paddle it with a plank of wood. Eventually, you find some land. It is a muddy island, and on the island appears to be a small wooden hut. You try to open it, but the door is locked."
 
         };
-
+    
 
 
     //This function handles exploration: movement based on your current location
@@ -52,7 +61,7 @@ void ExplorationEngine(int CurrentTile)
         int tileToMoveTo = CurrentTile;
         if (CurrentTile == 0) //if you are in a jungle
         {
-            if (JungleRNG.Next(1, 6) == 5) //and you roll a 5, you can move
+            if (/*JungleRNG.Next(1, 6) == 5*/true) //and you roll a 5, you can move
             {
 
                 movementDirection = Input.Substring(3);
@@ -256,12 +265,65 @@ void ExplorationEngine(int CurrentTile)
             Console.WriteLine("You see nothing except the item you already picked up.");
         }
     }
+    else if (Input.StartsWith("fight"))
+    {
+        if (EnemiesInLocation[CurrentTile] == Input.Substring(6))
+        {
+            int[] CombatResults = Combat.CombatLoop(Input.Substring(6), Health, Attack, Defense, Speed, Level);
+            switch (CombatResults[0])
+            {
+                case 0:
+                    Console.WriteLine("Enemy not found. Error Code C0.");
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    Console.WriteLine($"You have gained {CombatResults[2]} EXP.");
+                    if (XPUntilNextLevel <= CombatResults[2] && Level < 99)
+                    {
+                        int LevelFirstDigit;
+                        int LevelSecondDigit = int.Parse(Level.ToString().Substring(1));
+                        if (Level < 10)
+                        {
+                            LevelFirstDigit = 0;
+                        }
+                        else
+                        {
+                            LevelFirstDigit = int.Parse(Level.ToString().Remove(1));
+                        }
+
+                        Level++;
+                        XPUntilNextLevel = (((LevelFirstDigit * 2) + LevelSecondDigit + 1) * 100);
+                        Console.WriteLine($"Congratulations! You are now level {Level}! {XPUntilNextLevel} until level {Level + 1}.");
+                    }
+                    else if (Level == 99)
+                    {
+                        Console.WriteLine("You have reached the maximum level.");
+                    }
+                    else
+                    {
+                        XPUntilNextLevel -= CombatResults[2];
+                        Console.WriteLine($"{XPUntilNextLevel} until level {Level + 1}.");
+                    }
+                    string[] Drops = Combat.RollLootDrops(CombatResults[3]);
+                    foreach (string ItemDropped in Drops)
+                    {
+                        variable.GetItem(ItemDropped);
+                        Console.WriteLine($"From the monster, you gained {ItemDropped}.");
+                    }
+                    break;
+            }
+        }
+    }
     else
     {
         Console.WriteLine("Invalid Command or Invalid Version.");
     }
 
-
+    if (variable.Inventory.Contains("Sword"))
+    {
+        SwordLevel = 1;
+    }
     ExplorationEngine(CurrentTile);
 
 }
